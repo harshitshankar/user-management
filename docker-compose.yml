@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.8'  # optional, you can remove this line
 
 services:
   db:
@@ -12,7 +12,7 @@ services:
       - db_data:/var/lib/mysql
 
   kafka:
-    image: bitnami/kafka:latest
+    image: bitnami/kafka:3.5.1
     ports:
       - "9092:9092"
     environment:
@@ -20,13 +20,13 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENERS: PLAINTEXT://:9092
       ALLOW_PLAINTEXT_LISTENER: "yes"
+    depends_on:
+      - zookeeper
 
   zookeeper:
-    image: bitnami/zookeeper:latest
+    image: bitnami/zookeeper:3.9.1
     ports:
       - "2181:2181"
 
 volumes:
   db_data:
-
-# TODO: You can add more services like Redis, other microservices, or monitoring tools
