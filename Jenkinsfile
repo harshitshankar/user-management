@@ -2,48 +2,65 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "harshitshankar1998/usermgmt-app:latest"
+        DOCKER_IMAGE = "yourdockerhubusername/usermgmt-app:latest"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/harshitshankar/user-management.git'
+                // Checkout code from GitHub
+                git branch: 'main', url: 'https://github.com/yourusername/user-management.git'
             }
         }
 
-        stage('Build') {
+        stage('Build Maven Project') {
             steps {
-                sh 'mvn clean package -DskipTests'
+                // Use 'bat' for Windows
+                bat 'mvn clean package -DskipTests'
             }
         }
 
         stage('Docker Login') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                    sh "docker login -u $USER -p $PASS"
+                    bat 'docker login -u %USER% -p %PASS%'
                 }
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t $DOCKER_IMAGE ."
+                bat 'docker build -t %DOCKER_IMAGE% .'
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                sh "docker push $DOCKER_IMAGE"
+                bat 'docker push %DOCKER_IMAGE%'
             }
         }
 
         stage('Run Docker Container') {
             steps {
-                sh "docker stop usermgmt || true"
-                sh "docker rm usermgmt || true"
-                sh "docker run -d --name usermgmt -p 8080:8080 $DOCKER_IMAGE"
+                // Stop container if already running
+                bat 'docker stop usermgmt || echo Container not running'
+                bat 'docker rm usermgmt || echo Container not existing'
+
+                // Run container
+                bat 'docker run -d --name usermgmt -p 8080:8080 %DOCKER_IMAGE%'
             }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline completed!'
+        }
+        success {
+            echo 'Pipeline executed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Check console output.'
         }
     }
 }
