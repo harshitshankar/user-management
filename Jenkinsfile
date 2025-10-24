@@ -2,14 +2,14 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "yourdockerhubusername/usermgmt-app:latest"
+        DOCKER_IMAGE = "harshitshankar1998/usermgmt-app:latest"
     }
 
     stages {
         stage('Checkout') {
             steps {
                 // Checkout code from GitHub
-                git branch: 'main', url: 'https://github.com/yourusername/user-management.git'
+                git branch: 'main', url: 'https://github.com/harshitshankar/user-management.git'
             }
         }
 
