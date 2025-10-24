@@ -9,7 +9,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout code from GitHub
-                git branch: 'main', url: 'https://github.com/harshitshankar/user-management.git'
+                git branch: 'master', url: 'https://github.com/harshitshankar/user-management.git'
             }
         }
 
