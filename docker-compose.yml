@@ -1,20 +1,25 @@
+networks:
+  user-management:
+    name: user-management
+    driver: bridge
+
 services:
+
   userdb:
     image: mysql:8.0.39
     container_name: userdb
-    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: userdb
     ports:
-      - "3307:3306"  # host:container mapping for accessing MySQL from Windows
+      - "3307:3306"  # host:container
     networks:
       - user-management
+    restart: unless-stopped
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.4
     container_name: zookeeper
-    restart: always
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -22,11 +27,11 @@ services:
       - "2181:2181"
     networks:
       - user-management
+    restart: unless-stopped
 
   kafka:
     image: confluentinc/cp-kafka:7.4.4
     container_name: kafka
-    restart: always
     depends_on:
       - zookeeper
     environment:
@@ -37,8 +42,16 @@ services:
       - "9092:9092"
     networks:
       - user-management
+    restart: unless-stopped
 
-networks:
-  user-management:
-    name: user-management
-    driver: bridge
+  usermgmt:
+    image: harshitshankar1998/usermgmt-app:latest
+    container_name: usermgmt
+    depends_on:
+      - userdb
+      - kafka
+    ports:
+      - "8081:8080"
+    networks:
+      - user-management
+    restart: unless-stopped
