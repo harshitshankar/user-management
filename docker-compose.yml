@@ -58,6 +58,5 @@ services:
 
 networks:
   user-management:
-    name: user-management
-    driver: bridge
+    external: true
 
