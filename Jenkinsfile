@@ -36,20 +36,27 @@ pipeline {
 
         stage('Deploy with Docker Compose') {
             steps {
-                // Clean old containers if any
+                // 🧰 Create Docker network automatically (safe if already exists)
+                bat 'docker network create user-management || echo "Network already exists"'
+
+                // 🧹 Clean old containers
                 bat 'docker-compose down || echo "No old containers"'
 
-                // Pull latest image to ensure it uses the pushed version
+                // 🆕 Pull latest app image
                 bat 'docker pull %DOCKER_IMAGE%'
 
-                // Start all services (MySQL, Zookeeper, Kafka, App) bat 'docker run -d --name usermgmt -p 8081:8080 --network user-management %DOCKER_IMAGE%'
+                // 🚀 Start all services (MySQL, Zookeeper, Kafka, App)
                 bat 'docker-compose up -d --build'
-                
-                bat 'docker stop usermgmt || echo Container not running'
-                
-                bat 'docker rm usermgmt || echo Container not existing'
 
-                bat 'docker run -d --name usermgmt -p 8081:8080 --network user-management --link userdb:db --link kafka:kafka  %DOCKER_IMAGE%'
+                // ⏳ Wait for app initialization
+                bat 'timeout /t 40'
+
+                // ✅ Test endpoint using curl
+                bat '''
+                curl -f http://localhost:8081/app/users || (
+                    echo "API not responding properly" && exit /b 1
+                )
+                '''
             }
         }
     }
@@ -59,7 +66,7 @@ pipeline {
             echo 'Pipeline completed!'
         }
         success {
-            echo '✅ Pipeline executed successfully! Application should be live on http://localhost:8081/api/users'
+            echo '✅ Pipeline executed successfully! Application should be live on http://localhost:8081/app/users'
         }
         failure {
             echo '❌ Pipeline failed. Check console output for details.'
