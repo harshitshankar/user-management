@@ -48,11 +48,28 @@ pipeline {
                 // 🚀 Start all services (MySQL, Zookeeper, Kafka, App)
                 bat 'docker-compose up -d --build'
                 
-                // Wait for app to start
-                bat 'timeout /t 40 /nobreak'
-
-                // ✅ Test endpoint using curl
-                bat 'curl -f http://localhost:8081/app/users || (echo "API not responding" && exit /b 1)'
+            }
+        }
+      stage('Wait for App') {
+            steps {
+                // Wait for /app/users to be ready
+                bat '''
+                powershell -Command "
+                $retries = 12;
+                $success = $false;
+                while (-not $success -and $retries -gt 0) {
+                    try {
+                        Invoke-WebRequest -Uri http://localhost:8081/app/users -UseBasicParsing -TimeoutSec 5
+                        $success = $true
+                    } catch {
+                        Write-Host 'Waiting for app to be ready...'
+                        Start-Sleep -Seconds 5
+                        $retries -= 1
+                    }
+                }
+                if (-not $success) { exit 1 }
+                "
+                '''
             }
         }
     }
