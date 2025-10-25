@@ -48,9 +48,6 @@ pipeline {
                 // 🚀 Start all services (MySQL, Zookeeper, Kafka, App)
                 bat 'docker-compose up -d --build'
 
-                // ⏳ Wait for app initialization
-                bat 'timeout /t 40'
-
                 // ✅ Test endpoint using curl
                 bat '''
                 curl -f http://localhost:8081/app/users || (
