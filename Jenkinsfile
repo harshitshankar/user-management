@@ -6,16 +6,15 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
-                // Checkout code from GitHub
                 git branch: 'master', url: 'https://github.com/harshitshankar/user-management.git'
             }
         }
 
         stage('Build Maven Project') {
             steps {
-                // Use 'bat' for Windows
                 bat 'mvn clean package -DskipTests -U'
             }
         }
@@ -28,25 +27,23 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build and Push Docker Image') {
             steps {
                 bat 'docker build -t %DOCKER_IMAGE% .'
-            }
-        }
-
-        stage('Push Docker Image') {
-            steps {
                 bat 'docker push %DOCKER_IMAGE%'
             }
         }
 
-        stage('Run Docker Container') {
+        stage('Deploy with Docker Compose') {
             steps {
-                // Stop container if already running
-                bat 'docker stop usermgmt || echo Container not existing'
-                bat 'docker rm usermgmt || echo Container not existing'
-                // Run container
-                bat 'docker run -d --name usermgmt -p 8081:8080 --network user-management %DOCKER_IMAGE%'
+                // Clean old containers if any
+                bat 'docker-compose down || echo "No old containers"'
+
+                // Pull latest image to ensure it uses the pushed version
+                bat 'docker pull %DOCKER_IMAGE%'
+
+                // Start all services (MySQL, Zookeeper, Kafka, App)
+                bat 'docker-compose up -d --build'
             }
         }
     }
@@ -56,10 +53,10 @@ pipeline {
             echo 'Pipeline completed!'
         }
         success {
-            echo 'Pipeline executed successfully!'
+            echo '✅ Pipeline executed successfully! Application should be live on http://localhost:8081/api/users'
         }
         failure {
-            echo 'Pipeline failed. Check console output.'
+            echo '❌ Pipeline failed. Check console output for details.'
         }
     }
 }
