@@ -47,13 +47,12 @@ pipeline {
 
                 // 🚀 Start all services (MySQL, Zookeeper, Kafka, App)
                 bat 'docker-compose up -d --build'
+                
+                // Wait for app to start
+                bat 'timeout /t 40 /nobreak'
 
                 // ✅ Test endpoint using curl
-                bat '''
-                curl -f http://localhost:8081/app/users || (
-                    echo "API not responding properly" && exit /b 1
-                )
-                '''
+                bat 'curl -f http://localhost:8081/app/users || (echo "API not responding" && exit /b 1)'
             }
         }
     }
