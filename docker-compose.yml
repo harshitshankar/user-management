@@ -55,8 +55,13 @@ services:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     networks:
       - user-management
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: 10s
+      retries: 10
+      start_period: 10s
+      timeout: 5s
 
 networks:
   user-management:
     external: true
-
