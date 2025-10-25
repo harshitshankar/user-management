@@ -50,7 +50,7 @@ pipeline {
                 
             }
         }
-      stage('Wait for App') {
+        stage('Wait for App') {
             steps {
                 // Wait for /app/users to be ready
                 bat '''
