@@ -43,7 +43,6 @@ pipeline {
         stage('Run Docker Container') {
             steps {
                 // Stop container if already running
-                bat 'docker stop usermgmt || echo Container not running'
                 bat 'docker rm usermgmt || echo Container not existing'
                 // Run container
                 bat 'docker run -d --name usermgmt -p 8081:8080 --network user-management %DOCKER_IMAGE%'
