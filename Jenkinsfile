@@ -47,7 +47,7 @@ pipeline {
                 bat 'docker rm usermgmt || echo Container not existing'
 
                 // Run container
-                bat 'docker run -d --name usermgmt -p 8081:8080 %DOCKER_IMAGE%'
+                bat 'docker run -d --name usermgmt -p 8081:8080 --link userdb:db --link kafka:kafka %DOCKER_IMAGE%'
             }
         }
     }
