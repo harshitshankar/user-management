@@ -5,7 +5,7 @@ networks:
     driver: bridge
 
 services:
-  # MySQL database
+  # MySQL database (no init SQL file)
   userdb:
     image: mysql:8.0.39
     container_name: userdb
@@ -13,12 +13,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: userdb
-    command:
-      - "--default-authentication-plugin=mysql_native_password"
-      - "--init-file"
-      - "/docker-entrypoint-initdb.d/init.sql"
-    volumes:
-      - ./mysql-init:/docker-entrypoint-initdb.d
+    # no --init-file here (you asked to remove init file setup)
     ports:
       - "3307:3306"     # connect from host to port 3307
     healthcheck:
@@ -39,7 +34,6 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "2181:2181"
-    # removed fragile healthcheck (many images lack nc/bash)
     networks:
       - user-management
 
@@ -57,7 +51,6 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     ports:
       - "9092:9092"
-    # removed fragile healthcheck (kafka CLI tools may not be present)
     networks:
       - user-management
 
@@ -70,7 +63,7 @@ services:
       - userdb
       - kafka
     ports:
-      - "8081:8080"
+      - "8081:8080"     # access app on localhost:8081
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://userdb:3306/userdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
