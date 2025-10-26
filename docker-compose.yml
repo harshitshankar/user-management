@@ -1,7 +1,6 @@
-version: '3.9'
-
 networks:
   user-management:
+    name: user-management
     driver: bridge
 
 services:
@@ -16,11 +15,6 @@ services:
     # no --init-file here (you asked to remove init file setup)
     ports:
       - "3307:3306"     # connect from host to port 3307
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
     networks:
       - user-management
 
@@ -54,20 +48,3 @@ services:
     networks:
       - user-management
 
-  # Your Spring Boot App
-  usermgmt:
-    image: harshitshankar1998/usermgmt-app:latest
-    container_name: usermgmt
-    restart: always
-    depends_on:
-      - userdb
-      - kafka
-    ports:
-      - "8081:8080"     # access app on localhost:8081
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://userdb:3306/userdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    networks:
-      - user-management
