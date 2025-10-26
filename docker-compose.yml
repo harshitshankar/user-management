@@ -40,8 +40,8 @@ services:
     ports:
       - "2181:2181"
     healthcheck:
-      test: ["CMD", "zkServer.sh", "status"]
-      interval: 15s
+      test: ["CMD-SHELL", "echo ruok | nc localhost 2181 | grep imok || exit 1"]
+      interval: 10s
       timeout: 5s
       retries: 10
     networks:
