@@ -51,26 +51,6 @@ pipeline {
             }
         }
 
-        stage('Wait for App') {
-            steps {
-                powershell """
-                \$retries = 12
-                \$success = \$false
-                while (-not \$success -and \$retries -gt 0) {
-                    try {
-                        Invoke-WebRequest -Uri http://localhost:8081/app/users -UseBasicParsing -TimeoutSec 5
-                        \$success = \$true
-                     } catch {
-                         Write-Host 'Waiting for app to be ready...'
-                         Start-Sleep -Seconds 5
-                         \$retries -= 1
-                      }
-                }
-                if (-not \$success) { exit 1 }
-                """
-           }
-        }
-    }
 
     post {
         always {
