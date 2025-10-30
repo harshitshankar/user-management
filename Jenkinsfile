@@ -37,7 +37,7 @@ pipeline {
         stage('Deploy with Docker Compose') {
             steps {
                 // 🧰 Create Docker network automatically (safe if already exists)
-                bat 'docker network create user-management || echo "Network already exists"'
+                //bat 'docker network create user-management || echo "Network already exists"'
 
                 // 🧹 Clean old containers
                 bat 'docker-compose down || echo "No old containers"'
