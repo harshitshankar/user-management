@@ -60,7 +60,7 @@ pipeline {
             echo '✅ Pipeline executed successfully! Application should be live on http://localhost:8081/app/users'
         }
         failure {
-            echo '❌ Pipeline failed. Check console output for details.'
+            echo '❌ Pipeline failed. Harshit make it Work .Check console output for details.'
         }
     }
 }
